@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>大乱斗游戏厅</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    html, body { overflow-y: auto; touch-action: auto; }
+    #bg { position: fixed; inset: 0; z-index: 0; }
+    .lobby { position: relative; z-index: 1; min-height: 100%; display: flex; flex-direction: column; align-items: center; padding: 56px 16px 32px; }
+    .logo { font-size: clamp(40px, 7vw, 72px); font-weight: 900; letter-spacing: 6px; text-align: center; line-height: 1.1;
+      background: linear-gradient(90deg, #00f5d4, #4cc9f0 30%, #9b5de5 55%, #f15bb5 75%, #ff9f1c);
+      background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: shine 6s linear infinite; filter: drop-shadow(0 6px 30px rgba(155,93,229,.45)); }
+    @keyframes shine { to { background-position: -200% 0; } }
+    .tag { margin-top: 10px; opacity: .65; letter-spacing: 6px; font-size: 14px; text-align: center; }
+    .games { display: grid; grid-template-columns: repeat(2, minmax(0, 420px)); gap: 28px; margin-top: 44px; width: 100%; justify-content: center; }
+    .game {
+      --c1: #00f5d4; --c2: #9b5de5;
+      position: relative; border-radius: 26px; overflow: hidden; text-decoration: none; color: #fff;
+      background: rgba(14, 18, 40, .7); border: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(14px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.4); transition: transform .3s cubic-bezier(.2,1.4,.4,1), box-shadow .3s, border-color .3s;
+    }
+    .game:hover { transform: translateY(-8px) scale(1.015); border-color: var(--c1); box-shadow: 0 26px 60px rgba(0,0,0,.45), 0 0 40px color-mix(in srgb, var(--c1) 40%, transparent); }
+    .game.ball { --c1: #ff5fa2; --c2: #ff9f1c; }
+    .game canvas { display: block; width: 100%; height: 230px; }
+    .game .info { padding: 20px 22px 22px; }
+    .game h2 { font-size: 28px; font-weight: 900; letter-spacing: 3px; display: flex; align-items: center; gap: 10px; }
+    .game h2 small { font-size: 12px; font-weight: 600; letter-spacing: 1px; padding: 3px 9px; border-radius: 999px;
+      background: linear-gradient(90deg, var(--c1), var(--c2)); color: #fff; }
+    .game p { margin-top: 8px; opacity: .72; font-size: 14px; line-height: 1.7; }
+    .feats { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .feats span { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); }
+    .play { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
+    .play .rec { font-size: 13px; opacity: .7; }
+    .play .go { padding: 11px 26px; border-radius: 14px; font-weight: 800; letter-spacing: 4px; font-size: 16px;
+      background: linear-gradient(90deg, var(--c1), var(--c2)); box-shadow: 0 8px 24px color-mix(in srgb, var(--c1) 45%, transparent); transition: filter .2s; }
+    .game:hover .go { filter: brightness(1.12); }
+    .foot { margin-top: 40px; opacity: .45; font-size: 12px; letter-spacing: 2px; text-align: center; }
+    @media (max-width: 900px) { .games { grid-template-columns: minmax(0, 460px); } .lobby { padding-top: 40px; } }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="lobby">
+    <div class="logo">大乱斗游戏厅</div>
+    <div class="tag">选一个战场 · 吃到最大</div>
+    <div class="games">
+      <a class="game snake" href="snake.html">
+        <canvas id="pv-snake"></canvas>
+        <div class="info">
+          <h2>贪吃蛇大乱斗 <small>霓虹竞技场</small></h2>
+          <p>吃光点不断变长，用身体拦住对手让它撞上来，吞下它留下的能量。小心别一头撞上别人！</p>
+          <div class="feats"><span>⚡ 加速冲刺</span><span>🧲 磁铁 · 🛡️ 护盾 · ✨ 双倍</span><span>🌠 流星雨事件</span><span>🤖 28 条 AI 蛇</span></div>
+          <div class="play"><span class="rec" id="rec-snake">还没有记录</span><span class="go">开始</span></div>
+        </div>
+      </a>
+      <a class="game ball" href="ball.html">
+        <canvas id="pv-ball"></canvas>
+        <div class="info">
+          <h2>球球大乱斗 <small>糖果星球</small></h2>
+          <p>大鱼吃小鱼！分裂身体突袭猎物，吐球喂病毒设陷阱，表情丰富的小球们正在等你来吃。</p>
+          <div class="feats"><span>✂️ 分裂突袭</span><span>🦠 病毒爆炸</span><span>🍬 糖果雨事件</span><span>😊 会变表情的 AI</span></div>
+          <div class="play"><span class="rec" id="rec-ball">还没有记录</span><span class="go">开始</span></div>
+        </div>
+      </a>
+    </div>
+    <div class="foot">鼠标 / 触屏均可游玩 · 纯本地运行无需联网</div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script>
+  (() => {
+    const { rand, TAU, pick } = G;
+    const sb = G.store.get('snake_best', 0), bb = G.store.get('ball_best', 0);
+    if (sb) document.getElementById('rec-snake').textContent = '🏆 最佳长度 ' + G.fmt(sb);
+    if (bb) document.getElementById('rec-ball').textContent = '🏆 最佳质量 ' + G.fmt(bb);
+
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    const sprites = new Map();
+    function ballSprite(color) {
+      if (sprites.has(color)) return sprites.get(color);
+      const S = 64, c = document.createElement('canvas');
+      c.width = c.height = S;
+      const g = c.getContext('2d');
+      const grd = g.createRadialGradient(S * .38, S * .32, 2, S / 2, S / 2, S / 2);
+      grd.addColorStop(0, G.shade(color, .6)); grd.addColorStop(.45, color); grd.addColorStop(1, G.shade(color, -.45));
+      g.fillStyle = grd; g.beginPath(); g.arc(S / 2, S / 2, S / 2 - 1, 0, TAU); g.fill();
+      sprites.set(color, c);
+      return c;
+    }
+    function glow(color) {
+      const k = 'g' + color;
+      if (sprites.has(k)) return sprites.get(k);
+      const S = 64, c = document.createElement('canvas');
+      c.width = c.height = S;
+      const g = c.getContext('2d');
+      const grd = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+      grd.addColorStop(0, 'rgba(255,255,255,.9)'); grd.addColorStop(.2, G.rgba(color, .9)); grd.addColorStop(1, G.rgba(color, 0));
+      g.fillStyle = grd; g.fillRect(0, 0, S, S);
+      sprites.set(k, c);
+      return c;
+    }
+    const COLS = ['#00f5d4', '#9b5de5', '#f15bb5', '#fee440', '#00bbf9', '#ff924c', '#8ac926'];
+
+    /* 背景：漂浮光点 */
+    const bg = document.getElementById('bg'), bctx = bg.getContext('2d');
+    let BW, BH;
+    const motes = Array.from({ length: 70 }, () => ({ x: Math.random(), y: Math.random(), r: rand(2, 6), c: pick(COLS), v: rand(.005, .02), ph: rand(0, TAU) }));
+    function fitBg() { ({ w: BW, h: BH } = G.fitCanvas(bg)); }
+    fitBg();
+    addEventListener('resize', fitBg);
+
+    /* 贪吃蛇预览 */
+    function setup(id) {
+      const cv = document.getElementById(id), g = cv.getContext('2d');
+      const o = { cv, g, w: 0, h: 0 };
+      const fit = () => { const r = cv.getBoundingClientRect(); o.w = r.width; o.h = r.height; cv.width = r.width * DPR; cv.height = r.height * DPR; };
+      fit(); addEventListener('resize', fit);
+      return o;
+    }
+    const ps = setup('pv-snake');
+    const snakes = [
+      { cols: ['#00f5d4', '#00f5d4', '#00bbf9', '#00bbf9'], n: 34, r: 9, a: 0, sp: .7, ax: .36, ay: .32, fx: 1, fy: 2, ph: 0, trail: [] },
+      { cols: ['#ff595e', '#ff924c', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93'], n: 44, r: 10, a: 0, sp: .55, ax: .4, ay: .3, fx: 2, fy: 1, ph: 2, trail: [] },
+      { cols: ['#f72585', '#b5179e', '#7209b7', '#3a0ca3', '#4361ee'], n: 26, r: 8, a: 0, sp: .9, ax: .3, ay: .36, fx: 3, fy: 2, ph: 4, trail: [] },
+    ];
+    const sfood = Array.from({ length: 40 }, () => ({ x: Math.random(), y: Math.random(), c: pick(COLS), ph: rand(0, TAU) }));
+    function drawSnakePv(t) {
+      const { g, w, h } = ps;
+      g.setTransform(DPR, 0, 0, DPR, 0, 0);
+      const bgG = g.createLinearGradient(0, 0, w, h);
+      bgG.addColorStop(0, '#0b1230'); bgG.addColorStop(1, '#170c33');
+      g.fillStyle = bgG; g.fillRect(0, 0, w, h);
+      g.strokeStyle = 'rgba(90,120,220,.12)'; g.lineWidth = 1.5;
+      const s = 16, hh = Math.sqrt(3) * s;
+      for (let col = 0, x = 0; x < w + s; col++, x += 1.5 * s) for (let y = (col % 2) * hh / 2; y < h + hh; y += hh) {
+        g.beginPath();
+        for (let k = 0; k < 6; k++) { const a = k * Math.PI / 3; g.lineTo(x + Math.cos(a) * (s - 1.5), y + Math.sin(a) * (s - 1.5)); }
+        g.closePath(); g.stroke();
+      }
+      g.globalCompositeOperation = 'lighter';
+      for (const f of sfood) { const r = 9 + Math.sin(t * 3 + f.ph) * 2; g.drawImage(glow(f.c), f.x * w - r, f.y * h - r, r * 2, r * 2); }
+      g.globalCompositeOperation = 'source-over';
+      for (const sn of snakes) {
+        const tt = t * sn.sp + sn.ph;
+        const hx = w / 2 + Math.sin(tt * sn.fx) * w * sn.ax, hy = h / 2 + Math.sin(tt * sn.fy + 1) * h * sn.ay;
+        sn.trail.unshift({ x: hx, y: hy });
+        if (sn.trail.length > sn.n * 3) sn.trail.length = sn.n * 3;
+        for (let i = Math.min(sn.trail.length - 1, sn.n * 3 - 1); i >= 0; i -= 3) {
+          const p = sn.trail[i], k = i / 3, rr = k > sn.n - 6 ? sn.r * (.5 + (sn.n - k) * .08) : sn.r;
+          g.drawImage(ballSprite(sn.cols[Math.floor(k / 2) % sn.cols.length]), p.x - rr, p.y - rr, rr * 2, rr * 2);
+        }
+        const p1 = sn.trail[0], p2 = sn.trail[Math.min(3, sn.trail.length - 1)];
+        const a = Math.atan2(p1.y - p2.y, p1.x - p2.x);
+        for (const sd of [-1, 1]) {
+          const ex = p1.x + Math.cos(a) * 3 - Math.sin(a) * sd * 5, ey = p1.y + Math.sin(a) * 3 + Math.cos(a) * sd * 5;
+          g.fillStyle = '#fff'; g.beginPath(); g.arc(ex, ey, 3.8, 0, TAU); g.fill();
+          g.fillStyle = '#111'; g.beginPath(); g.arc(ex + Math.cos(a) * 1.4, ey + Math.sin(a) * 1.4, 2.1, 0, TAU); g.fill();
+        }
+      }
+    }
+
+    /* 球球预览 */
+    const pb = setup('pv-ball');
+    const bcols = ['#ff4d6d', '#4cc9f0', '#ffd60a', '#9d4edd', '#70e000', '#ff9f1c'];
+    const blobs = [
+      { r: 46, c: '#4cc9f0', x: .3, y: .5, vx: 30, vy: 18 },
+      { r: 30, c: '#ff4d6d', x: .7, y: .3, vx: -40, vy: 30 },
+      { r: 22, c: '#ffd60a', x: .6, y: .75, vx: 50, vy: -28 },
+      { r: 18, c: '#9d4edd', x: .15, y: .2, vx: -36, vy: 44 },
+      { r: 36, c: '#70e000', x: .85, y: .7, vx: -24, vy: -32 },
+    ];
+    const bpel = Array.from({ length: 70 }, () => ({ x: Math.random(), y: Math.random(), c: pick(bcols) }));
+    let blinkT = 0;
+    function drawBallPv(t, dt) {
+      const { g, w, h } = pb;
+      g.setTransform(DPR, 0, 0, DPR, 0, 0);
+      g.fillStyle = '#f7f8fd'; g.fillRect(0, 0, w, h);
+      g.strokeStyle = 'rgba(60,70,130,.08)'; g.lineWidth = 1;
+      g.beginPath();
+      for (let x = 0; x < w; x += 24) { g.moveTo(x, 0); g.lineTo(x, h); }
+      for (let y = 0; y < h; y += 24) { g.moveTo(0, y); g.lineTo(w, y); }
+      g.stroke();
+      for (const p of bpel) g.drawImage(ballSprite(p.c), p.x * w - 4, p.y * h - 4, 8, 8);
+      // 病毒
+      g.save(); g.translate(w * .5, h * .5); g.rotate(t * .2);
+      g.beginPath();
+      for (let i = 0; i <= 40; i++) { const a = i / 40 * TAU, rr = i % 2 ? 30 : 26; g.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+      g.fillStyle = '#5fd068'; g.fill(); g.strokeStyle = '#238a3c'; g.lineWidth = 3; g.stroke(); g.restore();
+      blinkT -= dt; if (blinkT < -.15) blinkT = rand(2, 4);
+      for (const b of blobs) {
+        b.x += b.vx * dt / w; b.y += b.vy * dt / h;
+        if (b.x * w < b.r || b.x * w > w - b.r) { b.vx *= -1; b.x = G.clamp(b.x, b.r / w, 1 - b.r / w); }
+        if (b.y * h < b.r || b.y * h > h - b.r) { b.vy *= -1; b.y = G.clamp(b.y, b.r / h, 1 - b.r / h); }
+        const x = b.x * w, y = b.y * h, r = b.r * (1 + Math.sin(t * 4 + b.r) * .025);
+        g.fillStyle = 'rgba(40,40,90,.1)'; g.beginPath(); g.arc(x + 2, y + 4, r, 0, TAU); g.fill();
+        g.drawImage(ballSprite(b.c), x - r, y - r, r * 2, r * 2);
+        g.strokeStyle = G.shade(b.c, -.3); g.lineWidth = 2.5; g.beginPath(); g.arc(x, y, r - 1, 0, TAU); g.stroke();
+        const a = Math.atan2(b.vy, b.vx), lx = Math.cos(a) * r * .08, ly = Math.sin(a) * r * .08;
+        for (const sd of [-1, 1]) {
+          const ex = x + sd * r * .3 + lx, ey = y - r * .12 + ly;
+          if (blinkT < 0) { g.strokeStyle = '#2b2d42'; g.lineWidth = 2; g.beginPath(); g.arc(ex, ey, r * .1, .2, Math.PI - .2); g.stroke(); continue; }
+          g.fillStyle = '#fff'; g.beginPath(); g.ellipse(ex, ey, r * .16, r * .18, 0, 0, TAU); g.fill();
+          g.fillStyle = '#1d1e2c'; g.beginPath(); g.arc(ex + lx * .8, ey + ly * .8, r * .09, 0, TAU); g.fill();
+        }
+        g.strokeStyle = '#2b2d42'; g.lineWidth = Math.max(1.5, r * .05); g.lineCap = 'round';
+        g.beginPath(); g.arc(x + lx * .5, y + r * .14 + ly * .5, r * .12, .35, Math.PI - .35); g.stroke();
+      }
+    }
+
+    let last = performance.now();
+    function tick(now) {
+      const dt = Math.min(.05, (now - last) / 1000); last = now;
+      const t = now / 1000;
+      bctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      const grd = bctx.createRadialGradient(BW * .5, BH * .3, 50, BW * .5, BH * .5, Math.max(BW, BH) * .8);
+      grd.addColorStop(0, '#1a1340'); grd.addColorStop(1, '#05070f');
+      bctx.fillStyle = grd; bctx.fillRect(0, 0, BW, BH);
+      bctx.globalCompositeOperation = 'lighter';
+      for (const m of motes) {
+        m.y -= m.v * dt; if (m.y < -.05) { m.y = 1.05; m.x = Math.random(); }
+        const r = m.r * 4 * (1 + Math.sin(t * 2 + m.ph) * .2);
+        bctx.globalAlpha = .5;
+        bctx.drawImage(glow(m.c), m.x * BW + Math.sin(t + m.ph) * 20 - r, m.y * BH - r, r * 2, r * 2);
+      }
+      bctx.globalAlpha = 1; bctx.globalCompositeOperation = 'source-over';
+      drawSnakePv(t);
+      drawBallPv(t, dt);
+    }
+    function loop(now) {
+      tick(now);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+    window.__lobbyFrame = (n = 1) => { for (let i = 0; i < n; i++) tick(performance.now() + i * 16); };
+  })();
+  </script>
+</body>
+</html>

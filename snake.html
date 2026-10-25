@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>贪吃蛇大乱斗</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="menu">
+  <canvas id="game"></canvas>
+
+  <div id="topbar">
+    <a class="icon-btn" href="index.html" title="返回大厅">🏠</a>
+    <button class="icon-btn" id="btn-mute" title="声音">🔊</button>
+  </div>
+
+  <div id="leaderboard" class="hud panel"><h3>排行榜</h3><ol id="lb"></ol></div>
+  <div id="feed" class="hud"></div>
+  <div id="powers" class="hud"></div>
+  <div id="stats" class="hud panel">
+    <div class="lbl">长度</div>
+    <div class="big" id="st-score">0</div>
+    <div class="row"><span>排名 <b id="st-rank">-</b></span><span>击杀 <b id="st-kills">0</b></span><span>⏱ <b id="st-time">0:00</b></span></div>
+  </div>
+  <canvas id="minimap" class="hud"></canvas>
+  <div id="announce" class="hud"></div>
+  <div id="banner" class="hud"></div>
+
+  <div class="touch-ui"><button class="tbtn" data-action="boost">加速</button></div>
+
+  <div id="start" class="overlay">
+    <div class="card">
+      <div class="title">贪吃蛇大乱斗</div>
+      <div class="subtitle">吞噬 · 围剿 · 称霸竞技场</div>
+      <div class="field-label">昵称</div>
+      <input class="name" id="name" maxlength="10" placeholder="输入你的昵称" autocomplete="off">
+      <div class="field-label">选择皮肤</div>
+      <div class="skins" id="skins"></div>
+      <button class="btn" id="btn-start">开始游戏</button>
+      <div class="hint">
+        <span>🖱 鼠标控制方向</span>
+        <span><kbd>左键</kbd> / <kbd>空格</kbd> 加速</span>
+        <span>🧲 ⚡ 🛡️ ✨ 吃道具获得能力</span>
+        <span>用身体拦截对手！</span>
+      </div>
+      <div class="best" id="best"></div>
+    </div>
+  </div>
+
+  <div id="over" class="overlay hidden">
+    <div class="card">
+      <div class="title" style="font-size:36px">游戏结束</div>
+      <div class="killer" id="ov-killer"></div>
+      <div class="result-grid">
+        <div><div class="v" id="ov-peak">0</div><div class="l">最高长度</div></div>
+        <div><div class="v" id="ov-rank">-</div><div class="l">最高排名</div></div>
+        <div><div class="v" id="ov-kills">0</div><div class="l">击杀</div></div>
+        <div><div class="v" id="ov-time">0:00</div><div class="l">存活时间</div></div>
+      </div>
+      <div class="newbest" id="ov-best"></div>
+      <button class="btn" id="btn-again">再来一局</button>
+      <div class="btn-row">
+        <button class="btn ghost" id="btn-skin">更换皮肤</button>
+        <a class="btn ghost" href="index.html">返回大厅</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script src="js/snake.js"></script>
+</body>
+</html>
